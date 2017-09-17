@@ -10,7 +10,7 @@ namespace AnimeList.Layouts
             InitializeComponent();
         }
 
-        public BetterGridView AnimeGridView
+        public GridView AnimeGridView
         {
             get { return animeGridView; }
         }

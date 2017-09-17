@@ -1,6 +1,6 @@
 ﻿namespace AnimeList.UserInterface
 {
-    partial class BetterGridView
+    partial class GridView
     {
         /// <summary> 
         /// Required designer variable.

@@ -28,16 +28,16 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.animeGridView = new AnimeList.UserInterface.BetterGridView();
+            this.animeGridView = new AnimeList.UserInterface.GridView();
             this.SuspendLayout();
             // 
             // animeGridView
             // 
             this.animeGridView.AutoScroll = true;
             this.animeGridView.AutoScrollMinSize = new System.Drawing.Size(175, 0);
-            this.animeGridView.ButtonHeight = 200F;
-            this.animeGridView.ButtonMargin = 20F;
-            this.animeGridView.ButtonWidth = 100F;
+            this.animeGridView.CellHeight = 200F;
+            this.animeGridView.CellMargin = 20F;
+            this.animeGridView.CellWidth = 100F;
             this.animeGridView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.animeGridView.Location = new System.Drawing.Point(0, 0);
             this.animeGridView.Name = "animeGridView";
@@ -57,6 +57,6 @@
 
         #endregion
 
-        private UserInterface.BetterGridView animeGridView;
+        private UserInterface.GridView animeGridView;
     }
 }

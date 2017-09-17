@@ -5,219 +5,235 @@ using System.Windows.Forms;
 
 namespace AnimeList.UserInterface
 {
-    public class GridView : Panel
+    /// <summary>
+    /// A cool grid view that can display cells in rows and columns with configurable sizes.
+    /// </summary>
+    public partial class GridView : UserControl
     {
-        //public delegate void ItemClickedDelegate(GridViewImageButton item);
-        //public event ItemClickedDelegate ItemClicked;
-
-        private List<IGridViewCell> _buttons;
-        private float _buttonWidth = 100.0f;
-        private float _buttonHeight = 200.0f;
-        private float _buttonMargin = 20.0f;
+        private List<UserControl> _cells;
+        private float _cellWidth = 100.0f;
+        private float _cellHeight = 200.0f;
+        private float _cellMargin = 20.0f;
         private int _columns = 0;
         private int _rows = 0;
 
         /// <summary>
-        /// Width of a button in pixels.
+        /// Width of a cell in pixels.
         /// </summary>
-        public float ButtonWidth
+        public float CellWidth
         {
-            get { return _buttonWidth; }
+            get { return _cellWidth; }
             set
             {
                 if (value <= 0)
                     throw new Exception("Button width must be a positive number");
 
-                _buttonWidth = value;
+                _cellWidth = value;
                 Invalidate();
             }
         }
 
         /// <summary>
-        /// Height of a button in pixels.
+        /// Height of a cell in pixels.
         /// </summary>
-        public float ButtonHeight
+        public float CellHeight
         {
-            get { return _buttonHeight; }
+            get { return _cellHeight; }
             set
             {
                 if (value <= 0)
                     throw new Exception("Button height must be a positive number");
 
-                _buttonHeight = value;
+                _cellHeight = value;
                 Invalidate();
             }
         }
 
         /// <summary>
-        /// Extra space around a button.
+        /// Extra space around a cell.
         /// </summary>
-        public float ButtonMargin
+        public float CellMargin
         {
-            get { return _buttonMargin; }
+            get { return _cellMargin; }
             set
             {
                 if (value <= 0)
                     throw new Exception("Button spacing must be a positive number");
 
-                _buttonMargin = value;
+                _cellMargin = value;
                 Invalidate();
             }
         }
 
         /// <summary>
-        /// The number of buttons in this grid view.
+        /// The number of cells in this grid view.
         /// </summary>
-        public int ButtonCount
+        public int CellCount
         {
-            get { return _buttons.Count; }
+            get { return _cells.Count; }
         }
-
+        
+        /// <summary>
+        /// The number of columns this grid view has.
+        /// </summary>
         public int Coulmns
         {
             get { return _columns; }
         }
 
+        /// <summary>
+        /// The number of rows this grid view has.
+        /// </summary>
         public int Rows
         {
             get { return _rows; }
         }
 
-        public GridView(List<IGridViewCell> buttons)
+        public void Initialize()
+        {
+            InitializeComponent();
+
+            RefreshCells();
+        }
+
+        public GridView(List<UserControl> cells)
             : base()
         {
             DoubleBuffered = true;
 
-            _buttons = buttons;
+            _cells = cells;
 
-            RefreshButtons();
-
-            MouseClick += ButtonGridView_MouseClick;
+            Initialize();
         }
 
         public GridView()
-            : this(new List<IGridViewCell>())
+            : this(new List<UserControl>())
         {
 
         }
 
-        public GridView(IGridViewCell[] buttons)
+        public GridView(UserControl[] cells)
             : this()
         {
-            _buttons.AddRange(buttons);
+            _cells.AddRange(cells);
         }
 
-        public void RemoveButtons()
+        /// <summary>
+        /// Removes all the cells from this grid view.
+        /// </summary>
+        public void RemoveCells()
         {
-            _buttons.Clear();
-            RefreshButtons();
+            _cells.Clear();
+            RefreshCells();
         }
 
-        public void AddButton(IGridViewCell button)
+        /// <summary>
+        /// Adds the given cell to the grid view.
+        /// </summary>
+        /// <param name="cell">the cell to add</param>
+        public void AddCell(UserControl cell)
         {
-            _buttons.Add(button);
+            _cells.Add(cell);
 
-            RefreshButtons();
+            RefreshCells();
         }
 
-        public void AddButtons(IGridViewCell[] buttons)
+        /// <summary>
+        /// Adds the array of cells to the grid view.
+        /// </summary>
+        /// <param name="cells">the cells to add</param>
+        public void AddCells(UserControl[] cells)
         {
-            _buttons.AddRange(buttons);
+            _cells.AddRange(cells);
 
-            RefreshButtons();
+            RefreshCells();
         }
-
-        private void RefreshButtons()
+        
+        /// <summary>
+        /// Removes the cells that should be removed, adds the new cells and updates each cell with its new position and size.
+        /// </summary>
+        private void RefreshCells()
         {
             // calculate how many columns we can have
-            _columns = (int)((base.Width - 25.0f) / (ButtonWidth + ButtonMargin * 2.0f));
-            _rows = (int)Math.Ceiling(_buttons.Count / (float)_columns);
+            _columns = (int)((base.Width - 25.0f) / (CellWidth + CellMargin * 2.0f));
+            _rows = (int)Math.Ceiling(_cells.Count / (float)_columns);
 
-            // calculate the needed size for the buttons
+            // calculate the needed size for the cells
             int width = base.Width - 25; // the width is obvious, minus the scrollbar width(-ish)
-            int height = (int)Math.Ceiling(_rows * (ButtonHeight + ButtonMargin) + ButtonMargin);
+            int height = (int)Math.Ceiling(_rows * (CellHeight + CellMargin) + CellMargin);
             base.AutoScrollMinSize = new Size(width, height);
+
+            // set each button's size, remove cells that have been removed, add cells that are new
+            var controlsToRemove = new List<UserControl>();
+            Controls.Each(_ =>
+            {
+                var cell = _ as UserControl;
+
+                // the control is old, so remove it
+                if (!_cells.Contains(cell))
+                {
+                    controlsToRemove.Add(cell);
+                    return;
+                }
+
+                // set the new size of the control
+                cell.Size = new Size((int)_cellWidth, (int)_cellHeight);
+            });
+
+            // remove the old controls
+            controlsToRemove.ForEach(_ => Controls.Remove(_));
+
+            // add the new cells
+            int cellIndex = 0;
+            _cells.ForEach(_ =>
+            {
+                var cell = _ as UserControl;
+
+                // if the control is new, add it
+                if (!Controls.Contains(cell))
+                {
+                    cell.Size = new Size((int)_cellWidth, (int)_cellHeight);
+                    Controls.Add(cell);
+                }
+
+                RefreshCellPosition(cell, cellIndex);
+
+                cellIndex++;
+            });
+        }
+
+        /// <summary>
+        /// Updates the given cell with the given index to its index based position.
+        /// </summary>
+        /// <param name="cell">the cell to update</param>
+        /// <param name="i">the index of the cell</param>
+        private void RefreshCellPosition(UserControl cell, int i)
+        {
+            if (_columns == 0) // for example, when the window is minimized
+                return;
+
+            var X = i % _columns * (CellWidth + CellMargin * 2) + CellMargin + AutoScrollPosition.X;
+            var Y = i / _columns * (CellHeight + CellMargin) + CellMargin + AutoScrollPosition.Y;
+            cell.Location = new Point((int)X, (int)Y);
         }
 
         protected override void OnResize(EventArgs eventargs)
         {
             base.OnResize(eventargs);
-            RefreshButtons();
-            Invalidate();
+            RefreshCells();
+            //Invalidate();
         }
 
         protected override void OnSizeChanged(EventArgs e)
         {
             base.OnSizeChanged(e);
-            RefreshButtons();
-            Invalidate();
+            RefreshCells();
+            //Invalidate();
         }
 
-        private RectangleF paintRect = new RectangleF();
-        protected override void OnPaint(PaintEventArgs e)
+        protected override Point ScrollToControl(Control activeControl)
         {
-            // first, we translate the canvas
-            e.Graphics.TranslateTransform(base.AutoScrollPosition.X, base.AutoScrollPosition.Y);
-
-            e.Graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.Bicubic;
-            e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-            e.Graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
-            e.Graphics.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceCopy;
-            e.Graphics.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.Default;
-
-            // clear the canvas
-            e.Graphics.Clear(BackColor);
-
-            // now we draw the buttons
-            for (int i = 0; i < _buttons.Count; i++)
-            {
-                paintRect.X = i % _columns * (ButtonWidth + ButtonMargin * 2) + ButtonMargin;
-                paintRect.Y = i / _columns * (ButtonHeight + ButtonMargin) + ButtonMargin;
-                paintRect.Width = ButtonWidth;
-                paintRect.Height = ButtonHeight;
-                _buttons[i].OnPaint(e.Graphics, paintRect);
-            }
-        }
-
-        private void ButtonGridView_MouseClick(object sender, MouseEventArgs e)
-        {
-            //int column = (int)((e.X - base.AutoScrollPosition.X) / ButtonWidth);
-            //int row = (int)((e.Y - base.AutoScrollPosition.Y) / ButtonHeight);
-            //if (column < _columns && row < Math.Ceiling((double)_buttons.Count / _columns))
-            //{
-            //    _buttons[row * _columns + column].Click();
-            //}
-        }
-
-        public RectangleF PositionOf(GridViewImageButton btn)
-        {
-            // find the index of this button
-            int idx;
-            for (idx = 0; idx < _buttons.Count; idx++)
-            {
-                if (_buttons[idx] == btn)
-                    break;
-            }
-
-            if (idx == _buttons.Count) // not in the gridview
-                return new RectangleF(0.0f, 0.0f, 0.0f, 0.0f);
-
-            // calculate the bounding rectangle
-            return new RectangleF(
-                idx % _columns * ButtonWidth + base.AutoScrollPosition.X,
-                idx / _columns * ButtonHeight + base.AutoScrollPosition.Y,
-                ButtonWidth,
-                ButtonHeight
-            );
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-            foreach (var button in _buttons)
-            {
-                button.Dispose();
-            }
+            return this.AutoScrollPosition;
         }
     }
 }

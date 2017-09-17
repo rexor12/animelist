@@ -6,8 +6,14 @@ using System.Xml.Linq;
 
 namespace AnimeList.Data
 {
+    /// <summary>
+    /// Contains data related to an anime. This can be used in a user's anime list.
+    /// </summary>
     public class AnimeData : IDisposable
     {
+        /// <summary>
+        /// Watch status of the anime.
+        /// </summary>
         public enum AnimeStatus
         {
             Unknown,
@@ -19,6 +25,9 @@ namespace AnimeList.Data
             Watched
         }
 
+        /// <summary>
+        /// The ID that's going to be used by the next anime data object.
+        /// </summary>
         private static int _nextId = 0;
 
         private AnimeData(int id)
@@ -83,6 +92,10 @@ namespace AnimeList.Data
             CoverImage?.Dispose();
         }
 
+        /// <summary>
+        /// Converts the data to XML format.
+        /// </summary>
+        /// <returns>the XML representation of this object</returns>
         public XElement ToXml()
         {
             return new XElement("anime",
@@ -99,6 +112,11 @@ namespace AnimeList.Data
             );
         }
 
+        /// <summary>
+        /// Constructs an anime data object from the given XML element.
+        /// </summary>
+        /// <param name="element">the XML element that has the anime data</param>
+        /// <returns>the constructed anime data object</returns>
         public static AnimeData FromXml(XElement element)
         {
             return new AnimeData(int.Parse(element.Descendants("id").First().Value))
