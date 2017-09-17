@@ -2,15 +2,12 @@
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using System.Net;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using AnimeList.Data;
 using AnimeList.Layouts;
 using AnimeList.UserInterface;
 using System.Collections.Generic;
 using System.Drawing.Imaging;
-using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Xml.Linq;
@@ -66,11 +63,26 @@ namespace AnimeList
 
         private async void downloadAnimePlanetButton_Click(object sender, EventArgs e)
         {
-            // download the anime list of the almighty Rexor
+            // download the anime list
             Debug.WriteLine("Getting data for Anime-Planet..");
             var scraper = new AnimePlanetScraper();
-            AnimeList = await scraper.Scrape("AnnaSartin");
+            AnimeList = await scraper.Scrape("Rexor");
             Debug.WriteLine("Finished getting data for Anime-Planet.");
+
+            // save the downloaded anime list
+            SaveAnimeList(AnimeList);
+
+            // display the downloaded anime list in the app
+            DisplayAnimeList(AnimeList);
+        }
+
+        private async void downloadMyAnimeListButton_Click(object sender, EventArgs e)
+        {
+            // download the anime list
+            Debug.WriteLine("Getting data for MyAnimeList..");
+            var scraper = new MyAnimeListScraper();
+            AnimeList = await scraper.Scrape("Unknown");
+            Debug.WriteLine("Finished getting data for MyAnimeList.");
 
             // save the downloaded anime list
             SaveAnimeList(AnimeList);

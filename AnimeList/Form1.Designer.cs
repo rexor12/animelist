@@ -59,15 +59,16 @@
             // downloadAnimePlanetButton
             // 
             this.downloadAnimePlanetButton.Name = "downloadAnimePlanetButton";
-            this.downloadAnimePlanetButton.Size = new System.Drawing.Size(147, 22);
+            this.downloadAnimePlanetButton.Size = new System.Drawing.Size(152, 22);
             this.downloadAnimePlanetButton.Text = "Anime-Planet";
             this.downloadAnimePlanetButton.Click += new System.EventHandler(this.downloadAnimePlanetButton_Click);
             // 
             // downloadMyAnimeListButton
             // 
             this.downloadMyAnimeListButton.Name = "downloadMyAnimeListButton";
-            this.downloadMyAnimeListButton.Size = new System.Drawing.Size(147, 22);
+            this.downloadMyAnimeListButton.Size = new System.Drawing.Size(152, 22);
             this.downloadMyAnimeListButton.Text = "MyAnimeList";
+            this.downloadMyAnimeListButton.Click += new System.EventHandler(this.downloadMyAnimeListButton_Click);
             // 
             // statusStrip1
             // 
@@ -80,9 +81,9 @@
             // layout
             // 
             this.layout.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.layout.Location = new System.Drawing.Point(0, 0);
+            this.layout.Location = new System.Drawing.Point(0, 24);
             this.layout.Name = "layout";
-            this.layout.Size = new System.Drawing.Size(1264, 681);
+            this.layout.Size = new System.Drawing.Size(1264, 635);
             this.layout.TabIndex = 1;
             // 
             // Form1
